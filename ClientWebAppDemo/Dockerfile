@@ -1,0 +1,27 @@
+#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+RUN apt-get update
+RUN apt-get install -y curl
+RUN apt-get install -y libpng-dev libjpeg-dev curl libxi6 build-essential libgl1-mesa-glx
+RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install -g pnpm
+WORKDIR /src
+COPY ["ClientWebAppDemo/ClientWebAppDemo.csproj", "ClientWebAppDemo/"]
+RUN dotnet restore "ClientWebAppDemo/ClientWebAppDemo.csproj"
+COPY . .
+WORKDIR "/src/ClientWebAppDemo"
+RUN dotnet build "ClientWebAppDemo.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "ClientWebAppDemo.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "ClientWebAppDemo.dll"]

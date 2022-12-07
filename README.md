@@ -1,4 +1,6 @@
 # ClientWebAppDemo
+Demo: http://demo.cr.kida.ml/contacts
+
 To run:
 ```
 git clone https://github.com/uiopak/ClientWebAppDemo.git

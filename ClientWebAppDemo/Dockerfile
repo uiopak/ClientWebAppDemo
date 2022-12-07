@@ -3,6 +3,12 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
+#RUN apt-get update
+#RUN apt-get install -y curl
+#RUN apt-get install -y libpng-dev libjpeg-dev curl libxi6 build-essential libgl1-mesa-glx
+#RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash -
+#RUN apt-get install -y nodejs
+#RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 RUN apt-get update
@@ -10,6 +16,7 @@ RUN apt-get install -y curl
 RUN apt-get install -y libpng-dev libjpeg-dev curl libxi6 build-essential libgl1-mesa-glx
 RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash -
 RUN apt-get install -y nodejs
+#RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm@7
 RUN npm install -g pnpm
 WORKDIR /src
 COPY ["ClientWebAppDemo/ClientWebAppDemo.csproj", "ClientWebAppDemo/"]
@@ -19,7 +26,7 @@ WORKDIR "/src/ClientWebAppDemo"
 RUN dotnet build "ClientWebAppDemo.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ClientWebAppDemo.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "ClientWebAppDemo.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
